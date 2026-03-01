@@ -488,3 +488,5 @@ API/appsettings.Development.json
 *.sqlite
 
 API/reactivites.db
+API/reactivites.db-shm
+.gitignore
