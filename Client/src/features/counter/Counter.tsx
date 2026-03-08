@@ -12,7 +12,7 @@ const Counter =  observer(function Counter() {
                 <ButtonGroup sx={{mt: 3}}>
                     <Button onClick={() => counterStore.decrement()} variant="contained" color="error">Decrement</Button>
                     <Button onClick={() => counterStore.increment()} variant="contained" color="success">Increment</Button>
-                    <Button onClick={() => counterStore.decrement(5)} variant="contained" color="primary">Increment by 5</Button>
+                    <Button onClick={() => counterStore.increment(5)} variant="contained" color="primary">Increment by 5</Button>
                 </ButtonGroup>
             </Box>
             <Box sx={{width: '40%', p: 4}}>
