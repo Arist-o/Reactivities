@@ -5,17 +5,20 @@ using MediatR;
 using Application.Activities.Queries;
 using Application.Activities.DTOs;
 using Application.Activities.Commands;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
     public class ActivitiesController : BaseApiController
     {
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<Activity>>> GetActivities()
         {
             return await Mediator.Send(new GetActivityList.Query());
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Activity>> GetActivityDetail(string id)
         {
