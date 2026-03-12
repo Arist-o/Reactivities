@@ -1,8 +1,10 @@
 using API.Middleware;
 using Application.Activities.Queries;
 using Application.Core;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -29,6 +31,8 @@ builder.Services.AddMediatR(x => {
     x.RegisterServicesFromAssemblyContaining<GetActivityList.Handler>();
     x.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
+
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<GetActivityList.Handler>();
 builder.Services.AddTransient<ExceptionMiddleware>();
@@ -44,7 +48,9 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000", "https://localhost:3000"));
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
+.AllowCredentials()
+.WithOrigins("http://localhost:3000", "https://localhost:3000"));
 
 app.UseAuthentication();
 app.UseAuthorization();

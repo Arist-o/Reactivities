@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Application.Profiles.DTOs;
+using Domain;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Domain
+namespace Application.Activities.DTOs
 {
-    public class Activity
+    public class ActivityDto
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public required string Id { get; set; } = Guid.NewGuid().ToString();
         public required string Title { get; set; }
         public DateTime Date { get; set; }
 
@@ -15,6 +17,10 @@ namespace Domain
         public required string Category { get; set; }
 
         public bool IsCancelled { get; set; }
+
+        public required string HostDisplayName { get; set; }
+
+        public required string HostId { get; set; }
 
         // location props
 
@@ -28,6 +34,6 @@ namespace Domain
 
         //navigation properties
 
-        public ICollection<ActivityAttendee> Attendees { get; set; } = [];
+        public ICollection<UserProfile> Attendees { get; set; } = [];
     }
 }
