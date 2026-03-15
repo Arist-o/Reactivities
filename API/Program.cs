@@ -4,11 +4,12 @@ using Application.Core;
 using Application.Interfaces;
 using Domain;
 using FluentValidation;
-using Infrastructure;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +23,7 @@ builder.Services.AddControllers(opt => {
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionSqlServer"));
 });
 
 
@@ -42,6 +43,14 @@ builder.Services.AddIdentityApiEndpoints<User>(opt =>
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>(); 
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("IsActivityHost", policy =>
+    {
+        policy.AddRequirements(new IsHostRequirement());
+    });
+});
+builder.Services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
 
 var app = builder.Build();
