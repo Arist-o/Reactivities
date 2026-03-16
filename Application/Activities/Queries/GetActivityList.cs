@@ -15,7 +15,7 @@ namespace Application.Activities.Queries
     public class GetActivityList
     {
         private const int MaxPageSize = 50;
-        public class Query : IRequest<Result<PagedList<ActivityDto,DateTime?>>> 
+        public class Query : IRequest<Result<PageResult<ActivityDto,DateTime?>>> 
         {
             public DateTime? Cursor { get; set; }
             private int _pageSize = 3;
@@ -26,9 +26,9 @@ namespace Application.Activities.Queries
                 set => _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
             }
         }
-        public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<PagedList<ActivityDto,DateTime ?>>>
+        public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<PageResult<ActivityDto,DateTime ?>>>
         {
-            public async Task<Result<PagedList<ActivityDto,DateTime?>>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<PageResult<ActivityDto,DateTime?>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var query = context.Activities
                     .OrderBy(a => a.Date)
@@ -50,8 +50,8 @@ namespace Application.Activities.Queries
                     activities.RemoveAt(activities.Count - 1);
                 }
 
-                return Result<PagedList<ActivityDto, DateTime?>>.Success(
-                    new PagedList<ActivityDto, DateTime?>
+                return Result<PageResult<ActivityDto, DateTime?>>.Success(
+                    new PageResult<ActivityDto, DateTime?>
                     {
                         Items = activities,
                         NextCutsor = nextCursor

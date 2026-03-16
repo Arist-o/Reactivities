@@ -13,10 +13,17 @@ namespace API.Controllers
     {
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<PagedList<ActivityDto,DateTime?>>> GetActivities(DateTime? cursor)
+        public async Task<ActionResult<PagedResult<ActivityDto>>> GetActivities([FromQuery] GetActivityPagination.Query query)
         {
-            return HandleResult(await Mediator.Send(new GetActivityList.Query { Cursor = cursor }));
+            return HandleResult(await Mediator.Send(query));
         }
+
+        //[AllowAnonymous]
+        //[HttpGet]
+        //public async Task<ActionResult<PageResult<ActivityDto,DateTime?>>> GetActivities(DateTime? cursor)
+        //{
+        //    return HandleResult(await Mediator.Send(new GetActivityList.Query { Cursor = cursor }));
+        //}
         //[AllowAnonymous]
         //[HttpGet]
         //public async Task<ActionResult<List<ActivityDto>>> GetActivities([FromQuery] GetActivityMultipleSearchDetails.Query query)

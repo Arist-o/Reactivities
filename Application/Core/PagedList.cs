@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Application.Core
 {
-    public class PagedList<T,TCursor>
+    public class PageResult<T,TCursor>
     {
         public List<T> Items { get; set; } = [];
 
