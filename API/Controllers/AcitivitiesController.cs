@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
+using Application.Core;
 using Domain;
 using MediatR;
 using Application.Activities.Queries;
@@ -13,9 +13,9 @@ namespace API.Controllers
     {
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<List<ActivityDto>>> GetActivities()
+        public async Task<ActionResult<PagedList<ActivityDto,DateTime?>>> GetActivities(DateTime? cursor)
         {
-            return HandleResult(await Mediator.Send(new GetActivityList.Query()));
+            return HandleResult(await Mediator.Send(new GetActivityList.Query { Cursor = cursor }));
         }
         //[AllowAnonymous]
         //[HttpGet]
