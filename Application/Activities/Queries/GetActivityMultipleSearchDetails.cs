@@ -2,30 +2,37 @@
 using Application.Core;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 namespace Application.Activities.Queries
 {
     public class GetActivityMultipleSearchDetails
     {
-        public class Query : IRequest<Result<List<ActivityDto>>>
+        public class Query : IRequest<Result<PagedResult<ActivityDto>>>
         {
             public DateTime StartDate { get; set; }
             public DateTime EndDate { get; set; }
 
             public string? Search { get; set; }
+
+            [Range(1, int.MaxValue, ErrorMessage = "Page number must be greater than 0")]
+            public int PageNumber { get; set; } = 1;
+
+            [Range(1, 50, ErrorMessage = "Page size must be beetween 1 and 50")]
+            public int PageSize { get; set; } = 10;
         }
 
-        public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<List<ActivityDto>>>
+        public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<PagedResult<ActivityDto>>>
         {
-            public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<PagedResult<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 if (request.StartDate != default && request.EndDate != default && request.StartDate > request.EndDate)
                 {
-                    return Result<List<ActivityDto>>.Failure("Start date cannot be after end date", 400);
+                    return Result<PagedResult<ActivityDto>>.Failure("Start date cannot be after end date", 400);
                 }
 
                 if (request.EndDate != default)
@@ -33,7 +40,7 @@ namespace Application.Activities.Queries
                     request.EndDate = request.EndDate.Date.AddDays(1).AddTicks(-1);
                 }
 
-                var query = context.Activities.AsQueryable();
+                var query = context.Activities.AsNoTracking();
 
                 if (request.StartDate != default)
                 {
@@ -52,17 +59,43 @@ namespace Application.Activities.Queries
                                           || x.City.Contains(request.Search)
                                           || x.Venue.Contains(request.Search));
                 }
+                var totalCount = await query.CountAsync(cancellationToken);
+               
+                if (totalCount == 0)
+                {
+                    return Result<PagedResult<ActivityDto>>.Failure("Activities not found", 404);
+                }
 
                 var activities = await query.ToListAsync(cancellationToken);
 
-                if (activities.Count == 0)
+                var items = await query
+                 .Include(x => x.Attendees)
+                 .OrderBy(x => x.Date)
+                 .ThenBy(x => x.Title)
+                 .Skip((request.PageNumber - 1) * request.PageSize)
+                 .Take(request.PageSize)
+                 .ToListAsync(cancellationToken);
+
+                var dtos = mapper.Map<List<ActivityDto>>(items);
+                var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
+
+                var metadata = new PaginationMetadata
                 {
-                    return Result<List<ActivityDto>>.Failure("Activities not found", 404);
-                }
+                    TotalCount = totalCount,
+                    PageSize = request.PageSize,
+                    CurrentPage = request.PageNumber,
+                    TotalPages = totalPages,
+                    HasNext = request.PageNumber < totalPages,
+                    HasPrevious = request.PageNumber > 1
+                };
 
-                var result = mapper.Map<List<ActivityDto>>(activities);
+                var pagedResult = new PagedResult<ActivityDto>
+                {
+                    Data = dtos,
+                    Metadata = metadata
+                };
 
-                return Result<List<ActivityDto>>.Success(result);
+                return Result<PagedResult<ActivityDto>>.Success(pagedResult);
             }
         }
     }

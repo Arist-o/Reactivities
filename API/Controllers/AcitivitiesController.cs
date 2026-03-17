@@ -13,7 +13,7 @@ namespace API.Controllers
     {
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<PagedResult<ActivityDto>>> GetActivities([FromQuery] GetActivityPagination.Query query)
+        public async Task<ActionResult<PagedResult<ActivityDto>>> GetActivities([FromQuery] GetActivityMultipleSearchDetails.Query query)
         {
             return HandleResult(await Mediator.Send(query));
         }
