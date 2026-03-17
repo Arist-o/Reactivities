@@ -18,18 +18,7 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(query));
         }
 
-        //[AllowAnonymous]
-        //[HttpGet]
-        //public async Task<ActionResult<PageResult<ActivityDto,DateTime?>>> GetActivities(DateTime? cursor)
-        //{
-        //    return HandleResult(await Mediator.Send(new GetActivityList.Query { Cursor = cursor }));
-        //}
-        //[AllowAnonymous]
-        //[HttpGet]
-        //public async Task<ActionResult<List<ActivityDto>>> GetActivities([FromQuery] GetActivityMultipleSearchDetails.Query query)
-        // {
-        //     return HandleResult(await Mediator.Send(query));
-        //}
+     
 
         [Authorize]
         [HttpGet("{id}")]

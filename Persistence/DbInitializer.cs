@@ -11,25 +11,27 @@ namespace Persistence
     {
         public static async Task SeedData(AppDbContext context,UserManager<User> userManager)
         {
-            var users = new List<User>()
+            if (!userManager.Users.Any())
+            {
+                var initialUsers = new List<User>()
                 {
-                    new() {DisplayName = "Bob",UserName = "bob@test.com",Email="bob@test.com"},
-                    new() {DisplayName = "Tom",UserName = "tom@test.com",Email="tom@test.com"},
-                    new() {DisplayName = "Jane",UserName = "jane@test.com",Email="jane@test.com"}
+                            new() {DisplayName = "Bob", UserName = "bob@test.com", Email="bob@test.com"},
+                            new() {DisplayName = "Tom", UserName = "tom@test.com", Email="tom@test.com"},
+                            new() {DisplayName = "Jane", UserName = "jane@test.com", Email="jane@test.com"}
                 };
-            if (!userManager.Users.Any()) {
-               
 
-                foreach (var user in users) {
+                foreach (var user in initialUsers)
+                {
                     await userManager.CreateAsync(user, "Pa$$w0rd");
                 }
             }
 
-
             if (context.Activities.Any()) return;
 
+            var users = context.Users.ToList();
+
             var activities = new List<Activity>
-        {
+            {
             new()
             {
                 Title = "Past Activity 1",
@@ -253,11 +255,11 @@ namespace Persistence
                     }
                 ]
             }
-        };
+        }; 
 
             context.Activities.AddRange(activities);
 
             await context.SaveChangesAsync();   
-        }
+        } 
     }
 }

@@ -29,13 +29,13 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 
 builder.Services.AddCors();
 builder.Services.AddMediatR(x => {
-    x.RegisterServicesFromAssemblyContaining<GetActivityList.Handler>();
+    x.RegisterServicesFromAssemblyContaining<GetActivityMultipleSearchDetails.Handler>();
     x.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
-builder.Services.AddValidatorsFromAssemblyContaining<GetActivityList.Handler>();
+builder.Services.AddValidatorsFromAssemblyContaining<GetActivityMultipleSearchDetails.Handler>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddIdentityApiEndpoints<User>(opt =>
 {

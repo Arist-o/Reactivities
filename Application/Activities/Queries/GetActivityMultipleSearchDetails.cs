@@ -24,6 +24,8 @@ namespace Application.Activities.Queries
 
             [Range(1, 50, ErrorMessage = "Page size must be beetween 1 and 50")]
             public int PageSize { get; set; } = 10;
+
+            public string[] ids { get; set; } = [];
         }
 
         public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<PagedResult<ActivityDto>>>
@@ -70,6 +72,7 @@ namespace Application.Activities.Queries
 
                 var items = await query
                  .Include(x => x.Attendees)
+                    .ThenInclude(xx => xx.User)
                  .OrderBy(x => x.Date)
                  .ThenBy(x => x.Title)
                  .Skip((request.PageNumber - 1) * request.PageSize)
