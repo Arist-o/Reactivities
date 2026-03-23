@@ -1,8 +1,10 @@
 ﻿using Application.Activities.DTOs;
 using Application.Core;
 using AutoMapper;
+using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Persistence;
 using System;
 using System.Collections.Generic;
@@ -25,7 +27,7 @@ namespace Application.Activities.Queries
             [Range(1, 50, ErrorMessage = "Page size must be beetween 1 and 50")]
             public int PageSize { get; set; } = 10;
 
-            public string[] ids { get; set; } = [];
+            public string[]? ids { get; set; } 
         }
 
         public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<PagedResult<ActivityDto>>>
@@ -42,7 +44,9 @@ namespace Application.Activities.Queries
                     request.EndDate = request.EndDate.Date.AddDays(1).AddTicks(-1);
                 }
 
+
                 var query = context.Activities.AsNoTracking();
+            
 
                 if (request.StartDate != default)
                 {
@@ -61,6 +65,11 @@ namespace Application.Activities.Queries
                                           || x.City.Contains(request.Search)
                                           || x.Venue.Contains(request.Search));
                 }
+                if (request.ids != null && request.ids.Any())
+                {
+                    query = query.Where(activity =>
+                        activity.Attendees.Any(attendee => request.ids.Contains(attendee.UserId)));
+                }
                 var totalCount = await query.CountAsync(cancellationToken);
                
                 if (totalCount == 0)
@@ -68,16 +77,18 @@ namespace Application.Activities.Queries
                     return Result<PagedResult<ActivityDto>>.Failure("Activities not found", 404);
                 }
 
-                var activities = await query.ToListAsync(cancellationToken);
-
                 var items = await query
-                 .Include(x => x.Attendees)
-                    .ThenInclude(xx => xx.User)
-                 .OrderBy(x => x.Date)
-                 .ThenBy(x => x.Title)
-                 .Skip((request.PageNumber - 1) * request.PageSize)
-                 .Take(request.PageSize)
-                 .ToListAsync(cancellationToken);
+                    .Include(x => x.Attendees)
+                        .ThenInclude(xx => xx.User)
+                    .OrderBy(x => x.Date)
+                    .ThenBy(x => x.Title)
+                    .Skip((request.PageNumber - 1) * request.PageSize)
+                    .Take(request.PageSize)
+                    .ToListAsync(cancellationToken);
+
+
+
+         
 
                 var dtos = mapper.Map<List<ActivityDto>>(items);
                 var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
