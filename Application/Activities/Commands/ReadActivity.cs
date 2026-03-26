@@ -1,4 +1,5 @@
-﻿using Application.Activities.DTOs;
+﻿using System.Linq.Dynamic.Core;
+using Application.Activities.DTOs;
 using Application.Core;
 using Application.Interfaces;
 using AutoMapper;
@@ -14,14 +15,14 @@ namespace Application.Activities.Commands
 {
     public class ReadActivity
     {
-        public class Command : IRequest<Result<PagedResult<ActivityDto>>>
+        public class Command : IRequest<Result<Application.Core.PagedResult<ActivityDto>>>
         {
             public required ReadActivityDto ReadActivityDto { get; set; }
         }
         public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor)
-          : IRequestHandler<Command, Result<PagedResult<ActivityDto>>>
+          : IRequestHandler<Command, Result<Application.Core.PagedResult<ActivityDto>>>
         {                   
-            public async Task<Result<PagedResult<ActivityDto>>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Application.Core.PagedResult<ActivityDto>>> Handle(Command request, CancellationToken cancellationToken)
             {
 
                 var activityMap = mapper.Map<ReadActivityDto>(request.ReadActivityDto);
@@ -29,7 +30,7 @@ namespace Application.Activities.Commands
 
                 if (activityMap.StartDate != default && activityMap.EndDate != default && activityMap.StartDate > activityMap.EndDate)
                 {
-                    return Result<PagedResult<ActivityDto>>.Failure("Start date cannot be after end date", 400);
+                    return Result<Application.Core.PagedResult<ActivityDto>>.Failure("Start date cannot be after end date", 400);
 
                 }
 
@@ -66,14 +67,24 @@ namespace Application.Activities.Commands
 
                 if (totalCount == 0)
                 {
-                    return Result<PagedResult<ActivityDto>>.Failure("Activities not found", 404);
+                    return Result<Application.Core.PagedResult<ActivityDto>>.Failure("Activities not found", 404);
+                }
+
+
+                if (!string.IsNullOrWhiteSpace(activityMap.ColumnName))
+                {
+                    string sortOrder = activityMap.AscDesc ? "ascending" : "descending";
+
+                    query = query.OrderBy($"{activityMap.ColumnName} {sortOrder}");
+                }
+                else
+                {
+                    query = query.OrderBy(x => x.Title);
                 }
 
                 var items = await query
                     .Include(x => x.Attendees)
                         .ThenInclude(xx => xx.User)
-                    .OrderBy(x => x.Date)
-                    .ThenBy(x => x.Title)
                     .Skip((activityMap.PageNumber - 1) * activityMap.PageSize)
                     .Take(activityMap.PageSize)
                     .ToListAsync(cancellationToken);
@@ -95,13 +106,13 @@ namespace Application.Activities.Commands
                     HasPrevious = activityMap.PageNumber > 1
                 };
 
-                var pagedResult = new PagedResult<ActivityDto>
+                var pagedResult = new Application.Core.PagedResult<ActivityDto>
                 {
                     Data = dtos,
                     Metadata = metadata
                 };
 
-                return Result<PagedResult<ActivityDto>>.Success(pagedResult);
+                return Result<Application.Core.PagedResult<ActivityDto>>.Success(pagedResult);
             }
         }
     }

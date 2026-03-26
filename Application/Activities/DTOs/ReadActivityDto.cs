@@ -20,5 +20,8 @@ namespace Application.Activities.DTOs
         public int PageSize { get; set; } = 10;
 
         public string[]? ids { get; set; }
+        public string? ColumnName { get; set; }
+
+        public bool AscDesc { get; set; } = true;
     }
 }

@@ -1,20 +1,18 @@
-﻿using Application.Activities.DTOs;
+﻿using System.Linq.Dynamic.Core;
+using Application.Activities.DTOs;
 using Application.Core;
 using AutoMapper;
-using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Persistence;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
+
+
 namespace Application.Activities.Queries
 {
     public class GetActivityMultipleSearchDetails
     {
-        public class Query : IRequest<Result<PagedResult<ActivityDto>>>
+        public class Query : IRequest<Result<Application.Core.PagedResult<ActivityDto>>>
         {
             public DateTime StartDate { get; set; }
             public DateTime EndDate { get; set; }
@@ -28,15 +26,19 @@ namespace Application.Activities.Queries
             public int PageSize { get; set; } = 10;
 
             public string[]? ids { get; set; } 
+
+            public string? ColumnName { get; set; }
+
+            public bool AscDesc { get; set; } = true;
         }
 
-        public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<PagedResult<ActivityDto>>>
+        public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<Application.Core.PagedResult<ActivityDto>>>
         {
-            public async Task<Result<PagedResult<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<Application.Core.PagedResult<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 if (request.StartDate != default && request.EndDate != default && request.StartDate > request.EndDate)
                 {
-                    return Result<PagedResult<ActivityDto>>.Failure("Start date cannot be after end date", 400);
+                    return Result<Application.Core.PagedResult<ActivityDto>>.Failure("Start date cannot be after end date", 400);
                 }
 
                 if (request.EndDate != default)
@@ -74,14 +76,25 @@ namespace Application.Activities.Queries
                
                 if (totalCount == 0)
                 {
-                    return Result<PagedResult<ActivityDto>>.Failure("Activities not found", 404);
+                    return Result<Application.Core.PagedResult<ActivityDto>>.Failure("Activities not found", 404);
                 }
+
+
+                if (!string.IsNullOrWhiteSpace(request.ColumnName))
+                {
+                    string sortOrder = request.AscDesc ? "ascending" : "descending";
+
+                    query = query.OrderBy($"{request.ColumnName} {sortOrder}");
+                }
+                else 
+                {
+                    query = query.OrderBy(x => x.Title);
+                }
+
 
                 var items = await query
                     .Include(x => x.Attendees)
                         .ThenInclude(xx => xx.User)
-                    .OrderBy(x => x.Date)
-                    .ThenBy(x => x.Title)
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .ToListAsync(cancellationToken);
@@ -103,13 +116,13 @@ namespace Application.Activities.Queries
                     HasPrevious = request.PageNumber > 1
                 };
 
-                var pagedResult = new PagedResult<ActivityDto>
+                var pagedResult = new Application.Core.PagedResult<ActivityDto>
                 {
                     Data = dtos,
                     Metadata = metadata
                 };
 
-                return Result<PagedResult<ActivityDto>>.Success(pagedResult);
+                return Result<Application.Core.PagedResult<ActivityDto>>.Success(pagedResult);
             }
         }
     }
