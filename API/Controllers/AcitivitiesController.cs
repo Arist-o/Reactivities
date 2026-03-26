@@ -18,7 +18,9 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(query));
         }
 
-     
+      
+
+
 
         [Authorize]
         [HttpGet("{id}")]
@@ -30,7 +32,13 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<string>> CreateActivity(CreateActivityDto activityDto)
         {
-            return HandleResult(await Mediator.Send(new Application.Activities.Commands.CreateActivity.Command { ActivityDto = activityDto }));
+            return HandleResult(await Mediator.Send(new CreateActivity.Command { ActivityDto = activityDto }));
+        }
+
+        [HttpPost("search")]
+        public async Task<ActionResult<ActivityDto>> ReadActivity(ReadActivityDto activityDto)
+        {
+            return HandleResult(await Mediator.Send(new ReadActivity.Command { ReadActivityDto = activityDto }));
         }
 
         [HttpPut("{id}")]
