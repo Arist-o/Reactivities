@@ -1,13 +1,13 @@
 ﻿using Application.Core;
-using Application.Profiles.DTOs;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Application.Profiles.DTOs;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Application.Profiles.Queries
 {
@@ -17,17 +17,20 @@ namespace Application.Profiles.Queries
         {
             public required string UserId { get; set; }
         }
-        public class Handler(AppDbContext context,IMapper mapper) : IRequestHandler<Query, Result<UserProfile>>
+
+        public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) : IRequestHandler<Query, Result<UserProfile>>
         {
             public async Task<Result<UserProfile>> Handle(Query request, CancellationToken cancellationToken)
             {
-              var profiles = await context.Users
-                    .ProjectTo<UserProfile>(mapper.ConfigurationProvider)
+                var profile = await context.Users
+                    .AsNoTracking() // ДОДАНО: Для отримання завжди свіжих лічильників
+                    .ProjectTo<UserProfile>(mapper.ConfigurationProvider,
+                        new { currentUserId = userAccessor.GetUserId() })
                     .SingleOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
-                return profiles == null
+                return profile == null
                     ? Result<UserProfile>.Failure("Profile not found", 404)
-                    : Result<UserProfile>.Success(profiles);
+                    : Result<UserProfile>.Success(profile);
             }
         }
     }

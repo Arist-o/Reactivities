@@ -1,14 +1,15 @@
-﻿using System.Linq.Dynamic.Core;
-using Application.Activities.DTOs;
+﻿using Application.Activities.DTOs;
 using Application.Core;
 using Application.Interfaces;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using System;
 using System.Collections.Generic;
+using System.Linq.Dynamic.Core;
 using System.Text;
 
 namespace Application.Activities.Commands
@@ -82,18 +83,13 @@ namespace Application.Activities.Commands
                     query = query.OrderBy(x => x.Title);
                 }
 
-                var items = await query
-                    .Include(x => x.Attendees)
-                        .ThenInclude(xx => xx.User)
+                var currentUserId = userAccessor.GetUserId();
+
+                var dtos = await query
+                    .ProjectTo<ActivityDto>(mapper.ConfigurationProvider, new { currentUserId })
                     .Skip((activityMap.PageNumber - 1) * activityMap.PageSize)
                     .Take(activityMap.PageSize)
                     .ToListAsync(cancellationToken);
-
-
-
-
-
-                var dtos = mapper.Map<List<ActivityDto>>(items);
                 var totalPages = (int)Math.Ceiling(totalCount / (double)activityMap.PageSize);
 
                 var metadata = new PaginationMetadata

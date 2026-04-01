@@ -1,11 +1,13 @@
-﻿using System.Linq.Dynamic.Core;
-using Application.Activities.DTOs;
+﻿using Application.Activities.DTOs;
 using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Dynamic.Core;
 
 
 namespace Application.Activities.Queries
@@ -32,7 +34,7 @@ namespace Application.Activities.Queries
             public bool AscDesc { get; set; } = true;
         }
 
-        public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Query, Result<Application.Core.PagedResult<ActivityDto>>>
+        public class Handler(AppDbContext context, IMapper mapper,IUserAccessor userAccessor) : IRequestHandler<Query, Result<Application.Core.PagedResult<ActivityDto>>>
         {
             public async Task<Result<Application.Core.PagedResult<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
             {
@@ -92,18 +94,20 @@ namespace Application.Activities.Queries
                 }
 
 
-                var items = await query
-                    .Include(x => x.Attendees)
-                        .ThenInclude(xx => xx.User)
+                var currentUserId = userAccessor.GetUserId();
+
+                
+                var dtos = await query
+                    .ProjectTo<ActivityDto>(mapper.ConfigurationProvider, new { currentUserId })
                     .Skip((request.PageNumber - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .ToListAsync(cancellationToken);
 
 
 
-         
 
-                var dtos = mapper.Map<List<ActivityDto>>(items);
+
+                
                 var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
 
                 var metadata = new PaginationMetadata
