@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Persistence;
 using Infrastructure.Photos;
+using API.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 
 
 builder.Services.AddCors();
+builder.Services.AddSignalR();
 builder.Services.AddMediatR(x => {
     x.RegisterServicesFromAssemblyContaining<GetActivityMultipleSearchDetails.Handler>();
     x.AddOpenBehavior(typeof(ValidationBehavior<,>));
@@ -70,6 +72,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<User>();
+app.MapHub<Commenthub>("/comments");
 
 
 using var scope = app.Services.CreateScope();
