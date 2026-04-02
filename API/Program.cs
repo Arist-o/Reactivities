@@ -91,6 +91,7 @@ catch (Exception ex)
     logger.LogError(ex,"An error occurred during migration.");
 }
 
+CommandRegistry.RegisterAllCommands(typeof(ReadActivity).Assembly);
 
-Console.WriteLine("Starting API...");
+
 app.Run();
