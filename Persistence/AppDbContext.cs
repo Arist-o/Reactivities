@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyModel.Resolution;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 namespace Persistence
 {
     public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(options)
@@ -20,9 +21,90 @@ namespace Persistence
 
         public required DbSet<UserFollowing> UserFollowings { get; set; }
 
+        public required DbSet<Area> Areas { get; set; }
+
+        public required DbSet<City> Cities { get; set; }
+
+        public required DbSet<Street> Streets { get; set; }
+
+        public required DbSet<WareHouse> WareHouses { get; set; }
+
+        public required DbSet<Report> Reports { get; set; }
+
+
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<Area>(entity =>
+            {
+                entity.Property(e => e.description).IsRequired().HasMaxLength(150);
+
+                entity.HasOne(e => e.area_center)
+                    .WithOne()
+                    .HasForeignKey<Area>(e => e.AreaCenterId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.ClientNoAction);
+            });
+
+            builder.Entity<City>(entity =>
+            {
+                entity.Property(e => e.description).IsRequired().HasMaxLength(150);
+
+                entity.HasOne(e => e.area)
+                    .WithMany(a => a.Cities)
+                    .HasForeignKey(e => e.AreaId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<Street>(entity =>
+            {
+                entity.Property(e => e.description).IsRequired().HasMaxLength(150);
+
+                entity.HasOne(e => e.city)
+                    .WithMany(c => c.streets)
+                    .HasForeignKey(e => e.CityId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+
+            });
+
+            builder.Entity<WareHouse>(entity =>
+            {
+                entity.Property(e => e.description).IsRequired().HasMaxLength(150);
+                entity.HasOne(e => e.city)
+                    .WithMany(c => c.wareHouses)
+                    .HasForeignKey(e => e.CityId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<Report>(entity =>
+            {
+                entity.Property(e => e.email).IsRequired().HasMaxLength(150);
+                entity.Property(e => e.phone).IsRequired().HasMaxLength(20);
+
+                entity.HasOne(e => e.Area)
+                    .WithMany()
+                    .HasForeignKey(e => e.AreaId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(e => e.City)
+                    .WithMany()
+                    .HasForeignKey(e => e.CityId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+
+                entity.HasOne(e => e.Street)
+                    .WithMany()
+                    .HasForeignKey(e => e.StreetId)
+                    .OnDelete(DeleteBehavior.NoAction);  
+
+                entity.HasOne(e => e.WareHouse)
+                    .WithMany()
+                    .HasForeignKey(e => e.WareHouseId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
 
             builder.Entity<ActivityAttendee>(x => x.HasKey(a => new { a.ActivityId, a.UserId }));
 
