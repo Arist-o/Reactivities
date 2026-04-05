@@ -28,15 +28,14 @@ namespace Application.Core
             CreateMap<Domain.Activity, ActivityDto>()
                 .ForMember(d => d.HostDisplayName, o => o.MapFrom(s =>
                     s.Attendees.FirstOrDefault(x => x.IsHost).User.DisplayName));
-            // ВИПРАВЛЕНО: Видалено дублікат мапінгу HostDisplayName
-
+       
             CreateMap<ActivityAttendee, UserProfile>()
                 .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.User.DisplayName))
                 .ForMember(d => d.Bio, o => o.MapFrom(s => s.User.Bio))
                 .ForMember(d => d.ImageUrl, o => o.MapFrom(s => s.User.ImageUrl))
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.User.Id))
                 .ForMember(d => d.FollowersCount, o => o.MapFrom(s => s.User.Followers.Count))
-                .ForMember(d => d.FollowingsCount, o => o.MapFrom(s => s.User.Followings.Count)) // ВИПРАВЛЕНО
+                .ForMember(d => d.FollowingsCount, o => o.MapFrom(s => s.User.Followings.Count)) 
                 .ForMember(d => d.Following, o => o.MapFrom(s =>
                     s.User.Followers.Any(x => x.Observer.Id == currentUserId)));
 

@@ -7,13 +7,13 @@ namespace Application.Report.DTOs
 {
     public class StreetDto
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public Guid Id { get; set; } 
 
         public required string description { get; set; }
 
         public string streets_type { get; set; }
 
-        public string CityId { get; set; }
+        public Guid CityId { get; set; }
 
     }
 }

@@ -89,11 +89,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Area", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AreaCenterId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid?>("AreaCenterId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("description")
                         .IsRequired()
@@ -111,12 +112,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.City", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AreaId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("AreaId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("description")
                         .IsRequired()
@@ -185,24 +186,21 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Report", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AreaId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("AreaId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CityId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("CityId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("StreetId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("StreetId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("WareHouseId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("WareHouseId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("date")
                         .HasColumnType("datetime2");
@@ -232,12 +230,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Street", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CityId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("CityId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("description")
                         .IsRequired()
@@ -348,12 +346,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.WareHouse", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CityId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("CityId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("description")
                         .IsRequired()
@@ -527,7 +525,7 @@ namespace Persistence.Migrations
                     b.HasOne("Domain.City", "area_center")
                         .WithOne()
                         .HasForeignKey("Domain.Area", "AreaCenterId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.Navigation("area_center");
                 });
@@ -578,25 +576,25 @@ namespace Persistence.Migrations
                     b.HasOne("Domain.Area", "Area")
                         .WithMany()
                         .HasForeignKey("AreaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.City", "City")
                         .WithMany()
                         .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.Street", "Street")
                         .WithMany()
                         .HasForeignKey("StreetId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.WareHouse", "WareHouse")
                         .WithMany()
                         .HasForeignKey("WareHouseId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Area");

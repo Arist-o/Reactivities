@@ -8,11 +8,11 @@ namespace Domain
 {
     public class WareHouse
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public required string description { get; set; }
 
-        public string CityId { get; set; }
+        public Guid CityId { get; set; }
 
         public City city { get; set; } = null!;
 

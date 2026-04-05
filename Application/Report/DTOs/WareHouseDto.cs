@@ -7,11 +7,11 @@ namespace Application.Report.DTOs
 {
     public class WareHouseDto
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public Guid Id { get; set; }
 
         public required string description { get; set; }
 
-        public string CityId { get; set; }
+        public Guid CityId { get; set; }
 
         public required int number { get; set; }
     }

@@ -6,21 +6,21 @@ namespace Domain
 {
     public class Report
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public Guid Id { get; set; } = Guid.NewGuid();
 
-        public string AreaId { get; set; }
+        public Guid AreaId { get; set; }
 
         public Area? Area { get; set; }
 
-        public string CityId { get; set; }
+        public Guid CityId { get; set; }
 
         public City City { get; set; } = null!;
 
-        public string StreetId { get; set; }
+        public Guid StreetId { get; set; }
 
         public Street Street { get; set; } = null!;
 
-        public string WareHouseId { get; set; } 
+        public Guid WareHouseId { get; set; } 
 
         public WareHouse WareHouse { get; set; } = null!;
 

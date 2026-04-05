@@ -7,18 +7,18 @@ namespace Application.Report.DTOs
 {
     public class ReportDto
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public Guid Id { get; set; } 
 
-        public string AreaId { get; set; } = string.Empty;
+        public Guid AreaId { get; set; } 
 
       
-        public string CityId { get; set; } = string.Empty;
+        public Guid CityId { get; set; } 
 
 
-        public string StreetId { get; set; } = string.Empty;
+        public Guid StreetId { get; set; } 
 
 
-        public string WareHouseId { get; set; } = string.Empty;
+        public Guid WareHouseId { get; set; } 
 
 
 
