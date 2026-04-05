@@ -10,7 +10,7 @@ namespace Domain
 
         public string AreaId { get; set; }
 
-        public Area Area { get; set; } = null!;
+        public Area? Area { get; set; }
 
         public string CityId { get; set; }
 

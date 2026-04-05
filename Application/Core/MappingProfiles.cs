@@ -3,6 +3,7 @@ using AutoMapper;
 using System.Linq;
 using Domain;
 using Application.Profiles.DTOs;
+using Application.Report.DTOs;
 
 namespace Application.Core
 {
@@ -14,6 +15,15 @@ namespace Application.Core
             CreateMap<Domain.Activity, Domain.Activity>();
             CreateMap<CreateActivityDto, Domain.Activity>();
             CreateMap<EditActivityDto, Domain.Activity>();
+            CreateMap<City, CityDto>();
+            CreateMap<Area, AreaResponseDto>();
+            CreateMap<Street, StreetDto>();
+            CreateMap<WareHouse, WareHouseDto>();
+            CreateMap<Domain.Report, ReportDto>();
+
+            CreateMap<AreaCreateDto, Domain.Area>();
+            CreateMap<AreaEditDto, Domain.Area>();
+
 
             CreateMap<Domain.Activity, ActivityDto>()
                 .ForMember(d => d.HostDisplayName, o => o.MapFrom(s =>

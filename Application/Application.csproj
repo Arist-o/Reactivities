@@ -20,5 +20,8 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Persistence\Persistence.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Report\DTOs\Area\" />
+  </ItemGroup>
 
 </Project>

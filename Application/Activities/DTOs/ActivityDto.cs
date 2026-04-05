@@ -35,5 +35,6 @@ namespace Application.Activities.DTOs
         //navigation properties
 
         public ICollection<UserProfile> Attendees { get; set; } = [];
+
     }
 }
