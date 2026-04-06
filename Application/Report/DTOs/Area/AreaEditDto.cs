@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Application.Report.DTOs
+namespace Application.Report.DTOs.Area
 {
     public class AreaEditDto
     {

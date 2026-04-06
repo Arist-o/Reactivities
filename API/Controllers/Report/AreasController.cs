@@ -1,8 +1,8 @@
-﻿using Application.Report.DTOs;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Application.Report.Queries;
-using Application.Report.Commands;
-namespace API.Controllers
+using Application.Report.DTOs.Area;
+using Application.Report.Commands.Area;
+namespace API.Controllers.Report
 {
     public class AreasController : BaseApiController
     {
@@ -25,10 +25,21 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(new EditArea.Command { AreaEditDto = areaEditDto }));
         }
 
+        [HttpPatch("{Id}/set-center")]
+        public async Task<ActionResult> EditColumnArea(Guid Id, [FromBody] Guid areaCenterId)
+        {
+            return HandleResult(await Mediator.Send(new EditColumnArea.Command { AreaEditColumnDto = new AreaEditColumnDto { Id = Id, AreaCenterId = areaCenterId } }));
+        }
+
         [HttpDelete("{Id}")]
         public async Task<ActionResult> DeleteArea(Guid Id)
         {
             return HandleResult(await Mediator.Send(new DeleteArea.Command { Id = Id }));
+        }
+        [HttpPost("with-center")] 
+        public async Task<ActionResult<Guid>> CreateAreaWithCenter([FromBody] CreateAreaWithCenter.Command command)
+        {
+            return HandleResult(await Mediator.Send(command));
         }
     }
 }

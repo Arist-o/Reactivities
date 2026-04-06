@@ -1,18 +1,19 @@
 using API.Middleware;
+using API.SignalR;
 using Application.Activities.Queries;
 using Application.Core;
 using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Photos;
 using Infrastructure.Security;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 using Persistence;
-using Infrastructure.Photos;
-using API.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,7 @@ builder.Services.AddSignalR();
 builder.Services.AddMediatR(x => {
     x.RegisterServicesFromAssemblyContaining<GetActivityMultipleSearchDetails.Handler>();
     x.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    x.AddOpenBehavior(typeof(TransactionBehavior<,>));
 });
 
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();

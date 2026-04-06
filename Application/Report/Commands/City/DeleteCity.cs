@@ -1,14 +1,14 @@
 ﻿using Application.Core;
+using Domain;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Application.Report.Commands
+namespace Application.Report.Commands.City
 {
-    public class DeleteArea
+    public class DeleteCity
     {
         public class Command : IRequest<Result<Unit>>
         {
@@ -18,16 +18,11 @@ namespace Application.Report.Commands
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
-               var area = await context.Areas.FindAsync([request.Id], cancellationToken);   
-
-                if (area == null) return Result<Unit>.Failure("Area not found", 404);
-
-                context.Areas.Remove(area);
-
+                var city = await context.Cities.FindAsync([ request.Id ], cancellationToken);
+                if (city == null) return Result<Unit>.Failure("City not found", 404);
+                context.Cities.Remove(city);
                 var result = await context.SaveChangesAsync(cancellationToken) > 0;
-
-                if(!result) return Result<Unit>.Failure("Failed to delete area", 400);
-
+                if (!result) return Result<Unit>.Failure("Failed to delete city", 400);
                 return Result<Unit>.Success(Unit.Value);
             }
         }

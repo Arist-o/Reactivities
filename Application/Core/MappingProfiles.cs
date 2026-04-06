@@ -1,9 +1,15 @@
 ﻿using Application.Activities.DTOs;
-using AutoMapper;
-using System.Linq;
-using Domain;
 using Application.Profiles.DTOs;
 using Application.Report.DTOs;
+using Application.Report.DTOs.Area;
+using Application.Report.DTOs.City;
+using Application.Report.DTOs.Report;
+using Application.Report.DTOs.Street;
+using Application.Report.DTOs.WareHouse;
+using AutoMapper;
+using Domain;
+using System.Linq;
+
 
 namespace Application.Core
 {
@@ -12,18 +18,47 @@ namespace Application.Core
         public MappingProfiles()
         {
             string? currentUserId = null;
-            CreateMap<Domain.Activity, Domain.Activity>();
-            CreateMap<CreateActivityDto, Domain.Activity>();
-            CreateMap<EditActivityDto, Domain.Activity>();
-            CreateMap<City, CityDto>();
-            CreateMap<Area, AreaResponseDto>();
+
+
+
+
+            CreateMap<CreateActivityDto, Activity>();
+            CreateMap<EditActivityDto, Activity>();
+            
+            
             CreateMap<Street, StreetDto>();
             CreateMap<WareHouse, WareHouseDto>();
             CreateMap<Domain.Report, ReportDto>();
 
-            CreateMap<AreaCreateDto, Domain.Area>();
-            CreateMap<AreaEditDto, Domain.Area>();
 
+            // area
+            CreateMap<AreaCreateDto, Area>();
+            CreateMap<AreaEditDto, Area>();
+            CreateMap<Area, AreaResponseDto>();
+            CreateMap<Area, AreaSimpleDto>();
+
+            // city
+            CreateMap<CityCreateDto, City>();
+            CreateMap<CityEditDto, City>();
+            CreateMap<City, CityResponseDto>();
+            CreateMap<City, CitySimpleDto>();
+
+            // Report
+            CreateMap<ReportCreateDto, Domain.Report>();
+            CreateMap<ReportEditDto, Domain.Report>();
+            CreateMap<Domain.Report, ReportResponseDto>();
+
+            // Street
+            CreateMap<StreetCreateDto, Street>();
+            CreateMap<StreetEditDto, Street>();
+            CreateMap<StreetEditColumnDto, Street>(); 
+            CreateMap<Street, StreetResponseDto>();
+
+            // WareHouse
+            CreateMap<WareHouseCreateDto, WareHouse>();
+            CreateMap<WareHouseEditDto, WareHouse>();
+            CreateMap<WareHouseEditColumnDto, WareHouse>(); 
+            CreateMap<WareHouse, WareHouseResponseDto>();
 
             CreateMap<Domain.Activity, ActivityDto>()
                 .ForMember(d => d.HostDisplayName, o => o.MapFrom(s =>
@@ -42,7 +77,7 @@ namespace Application.Core
             CreateMap<User, UserProfile>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
                 .ForMember(d => d.FollowersCount, o => o.MapFrom(s => s.Followers.Count))
-                .ForMember(d => d.FollowingsCount, o => o.MapFrom(s => s.Followings.Count)) // ВИПРАВЛЕНО
+                .ForMember(d => d.FollowingsCount, o => o.MapFrom(s => s.Followings.Count)) 
                 .ForMember(d => d.Following, o => o.MapFrom(s =>
                     s.Followers.Any(x => x.Observer.Id == currentUserId)));
 

@@ -1,5 +1,5 @@
 ﻿using Application.Core;
-using Application.Report.DTOs;
+using Application.Report.DTOs.Area;
 using AutoMapper;
 using MediatR;
 using Persistence;
@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Application.Report.Commands
+namespace Application.Report.Commands.Area
 {
     public class CreateArea
     {

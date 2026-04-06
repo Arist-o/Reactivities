@@ -1,5 +1,4 @@
 ﻿using Application.Core;
-using Application.Report.DTOs;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -8,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Application.Report.DTOs.Area;
 
 namespace Application.Report.Queries
 {
