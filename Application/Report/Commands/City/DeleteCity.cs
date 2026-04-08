@@ -1,7 +1,7 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using Domain;
 using MediatR;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +14,7 @@ namespace Application.Report.Commands.City
         {
             public required Guid Id { get; set; }
         }
-        public class Handler(AppDbContext context) : IRequestHandler<Command, Result<Unit>>
+        public class Handler(IAppDbContext context) : IRequestHandler<Command, Result<Unit>>
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {

@@ -2,12 +2,12 @@
 using Application.Report.DTOs.City;
 using AutoMapper;
 using MediatR;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper.QueryableExtensions;
+using Application.Interfaces;
 
 namespace Application.Report.Queries
 {
@@ -17,7 +17,7 @@ namespace Application.Report.Queries
         {
         }
 
-        public class Handler(AppDbContext context,IMapper mapper) : IRequestHandler<Query, Result<List<CityResponseDto>>>
+        public class Handler(IAppDbContext context,IMapper mapper) : IRequestHandler<Query, Result<List<CityResponseDto>>>
         {
 
             public async Task<Result<List<CityResponseDto>>> Handle(Query request, CancellationToken cancellationToken)

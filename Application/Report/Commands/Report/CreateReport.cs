@@ -1,8 +1,8 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using Application.Report.DTOs.Report;
 using AutoMapper;
 using MediatR;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,7 +15,7 @@ namespace Application.Report.Commands.Report
         {
             public required ReportCreateDto reportCreateDto { get; set; }
         }
-        public class Handler(AppDbContext context,IMapper mapper) : IRequestHandler<Command, Result<Guid>>
+        public class Handler(IAppDbContext context,IMapper mapper) : IRequestHandler<Command, Result<Guid>>
         {
             public async Task<Result<Guid>> Handle(Command request, CancellationToken cancellationToken)
             {

@@ -5,7 +5,6 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Dynamic.Core;
 
@@ -34,7 +33,7 @@ namespace Application.Activities.Queries
             public bool AscDesc { get; set; } = true;
         }
 
-        public class Handler(AppDbContext context, IMapper mapper,IUserAccessor userAccessor) : IRequestHandler<Query, Result<Application.Core.PagedResult<ActivityDto>>>
+        public class Handler(IAppDbContext context, IMapper mapper,IUserAccessor userAccessor) : IRequestHandler<Query, Result<Application.Core.PagedResult<ActivityDto>>>
         {
             public async Task<Result<Application.Core.PagedResult<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
             {

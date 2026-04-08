@@ -1,7 +1,7 @@
 ﻿using Application.Core;
 using Application.Interfaces;
 using MediatR;
-using Persistence;
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,7 +15,7 @@ namespace Application.Profiles.Commands
             public required string PhotoId { get; set; }
         }
 
-        public class Handler(AppDbContext context, IUserAccessor userAccessor,IPhotoService photoService) : IRequestHandler<Command, Result<Unit>>
+        public class Handler(IAppDbContext context, IUserAccessor userAccessor,IPhotoService photoService) : IRequestHandler<Command, Result<Unit>>
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -31,7 +31,7 @@ namespace Application.Profiles.Commands
 
                 user.Photos.Remove(photo);
 
-                var result = await context.SaveChangesAsync() > 0;
+                var result = await context.SaveChangesAsync(cancellationToken) > 0;
 
                 return result 
                     ? Result<Unit>.Success(Unit.Value) 

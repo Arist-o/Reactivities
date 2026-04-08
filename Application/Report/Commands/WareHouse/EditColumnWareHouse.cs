@@ -2,11 +2,11 @@
 using Application.Report.DTOs.WareHouse;
 using AutoMapper;
 using MediatR;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Application.Interfaces;
 
 namespace Application.Report.Commands.WareHouse
 {
@@ -16,7 +16,7 @@ namespace Application.Report.Commands.WareHouse
         {
             public required WareHouseEditColumnDto WareHouseEditColumnDto { get; set; }
         }
-        public class Handler(AppDbContext context) : IRequestHandler<Command, Result<Unit>>
+        public class Handler(IAppDbContext context) : IRequestHandler<Command, Result<Unit>>
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {

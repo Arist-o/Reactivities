@@ -3,7 +3,6 @@ using Application.Profiles.DTOs;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
-using Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,7 +20,7 @@ namespace Application.Profiles.Queries
 
         }
 
-        public class Handler(AppDbContext context, IMapper mapper,IUserAccessor userAccessor) : IRequestHandler<Query, Result<List<UserProfile>>>
+        public class Handler(IAppDbContext context, IMapper mapper,IUserAccessor userAccessor) : IRequestHandler<Query, Result<List<UserProfile>>>
         {
             public async Task<Result<List<UserProfile>>> Handle(Query request, CancellationToken cancellationToken)
             {

@@ -2,11 +2,11 @@
 using Application.Report.DTOs.Report;
 using AutoMapper;
 using MediatR;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Application.Interfaces;
 namespace Application.Report.Commands.Report
 {
     public class EditReport
@@ -16,7 +16,7 @@ namespace Application.Report.Commands.Report
             public required ReportEditDto ReportEditDto { get; set; }
         }
 
-        public class Handler(AppDbContext context,IMapper mapper) : IRequestHandler<Command, Result<Unit>>
+        public class Handler(IAppDbContext context,IMapper mapper) : IRequestHandler<Command, Result<Unit>>
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Domain;
-using Persistence;
+
 using Application.Core;
 using Microsoft.EntityFrameworkCore;
 using Application.Activities.DTOs;
@@ -16,7 +16,7 @@ namespace Application.Activities.Queries
         {
             public required string Id { get; set; }
         }
-        public class  Handler(AppDbContext context, IMapper mapper,IUserAccessor userAccessor) : IRequestHandler<Query, Result<ActivityDto>>  
+        public class  Handler(IAppDbContext context, IMapper mapper,IUserAccessor userAccessor) : IRequestHandler<Query, Result<ActivityDto>>  
         {
             public async Task<Result<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
             {

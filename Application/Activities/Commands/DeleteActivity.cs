@@ -1,6 +1,6 @@
 ﻿using Application.Core;
 using MediatR;
-using Persistence;
+using Application.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +14,7 @@ namespace Application.Activities.Commands
             public required string Id { get; set; }
         }
 
-        public class Handler(AppDbContext context) : IRequestHandler<Command,Result<Unit>>
+        public class Handler(IAppDbContext context) : IRequestHandler<Command,Result<Unit>>
         {
             
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)

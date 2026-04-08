@@ -1,9 +1,9 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using Application.Report.DTOs.Area;
 using Application.Report.DTOs.City;
 using AutoMapper;
 using MediatR;
-using Persistence;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +18,7 @@ namespace Application.Report.Commands.Area
             public required CityCreateDto City { get; set; }
         }
 
-        public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<Guid>>
+        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<Guid>>
         {
             public async Task<Result<Guid>> Handle(Command request, CancellationToken cancellationToken)
             {

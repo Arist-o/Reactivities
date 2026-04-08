@@ -1,8 +1,8 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using Application.Report.DTOs.City;
 using AutoMapper;
 using MediatR;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,7 +15,7 @@ namespace Application.Report.Commands.City
         {
             public required CityEditDto CityEditDto { get; set; }
         }   
-        public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<Unit>>
+        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<Unit>>
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {

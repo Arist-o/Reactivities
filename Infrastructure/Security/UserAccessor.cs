@@ -2,7 +2,6 @@
 using Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -10,7 +9,7 @@ using System.Text;
 
 namespace Infrastructure.Security
 {
-    public class UserAccessor(IHttpContextAccessor httpContextAccessor,AppDbContext dbContext) : IUserAccessor
+    public class UserAccessor(IHttpContextAccessor httpContextAccessor,IAppDbContext dbContext) : IUserAccessor
     {
         public async Task<User> GetUserAsync()
         {

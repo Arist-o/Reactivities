@@ -2,10 +2,6 @@
 using Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Application.Activities.Commands
 {
@@ -15,7 +11,7 @@ namespace Application.Activities.Commands
         {
             public required string Id { get; set; }
         }
-        public class Handler(IUserAccessor userAccessor, AppDbContext context) 
+        public class Handler(IUserAccessor userAccessor, IAppDbContext context) 
             : IRequestHandler<Commmand, Result<Unit>>
         {
             public async Task<Result<Unit>> Handle(Commmand request, CancellationToken cancellationToken)

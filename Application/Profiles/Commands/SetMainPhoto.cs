@@ -1,7 +1,7 @@
 ﻿using Application.Core;
 using Application.Interfaces;
 using MediatR;
-using Persistence;
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,7 +15,7 @@ namespace Application.Profiles.Commands
             public required string PhotoId { get; set; }
         }
 
-        public class Handler(AppDbContext context, IUserAccessor userAccessor) : IRequestHandler<Command, Result<Unit>>
+        public class Handler(IAppDbContext context, IUserAccessor userAccessor) : IRequestHandler<Command, Result<Unit>>
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {

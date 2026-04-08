@@ -1,11 +1,11 @@
 ﻿using Application.Core;
 using Application.Report.DTOs.Street;
 using MediatR;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Application.Interfaces;
 
 namespace Application.Report.Commands.Street
 {
@@ -15,7 +15,7 @@ namespace Application.Report.Commands.Street
         {
             public required StreetEditColumnDto StreetEditColumnDto { get; set; }
         }
-        public class Handler(AppDbContext context) : IRequestHandler<Command, Result<Unit>>
+        public class Handler(IAppDbContext context) : IRequestHandler<Command, Result<Unit>>
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {

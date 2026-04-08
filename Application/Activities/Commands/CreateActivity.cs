@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Domain;
-using Persistence;
 using Application.Activities.DTOs;
 using AutoMapper;
 using FluentValidation;
@@ -18,7 +17,7 @@ namespace Application.Activities.Commands
             public required CreateActivityDto ActivityDto { get; set; }
         }
 
-        public class Handler(AppDbContext context, IMapper mapper,IUserAccessor userAccessor) 
+        public class Handler(IAppDbContext context, IMapper mapper,IUserAccessor userAccessor) 
             : IRequestHandler<Command, Result<string>>
         {
             public async Task<Result<string>> Handle(Command request, CancellationToken cancellationToken)

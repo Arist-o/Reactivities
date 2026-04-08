@@ -4,7 +4,6 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Application.Profiles.DTOs;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,12 +17,12 @@ namespace Application.Profiles.Queries
             public required string UserId { get; set; }
         }
 
-        public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor) : IRequestHandler<Query, Result<UserProfile>>
+        public class Handler(IAppDbContext context, IMapper mapper, IUserAccessor userAccessor) : IRequestHandler<Query, Result<UserProfile>>
         {
             public async Task<Result<UserProfile>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var profile = await context.Users
-                    .AsNoTracking() // ДОДАНО: Для отримання завжди свіжих лічильників
+                    .AsNoTracking() 
                     .ProjectTo<UserProfile>(mapper.ConfigurationProvider,
                         new { currentUserId = userAccessor.GetUserId() })
                     .SingleOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);

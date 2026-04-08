@@ -1,8 +1,9 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using Application.Report.DTOs.Area;
 using AutoMapper;
 using MediatR;
-using Persistence;
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,7 +16,7 @@ namespace Application.Report.Commands.Area
         {
             public required AreaEditDto AreaEditDto { get; set; }
         }
-        public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<Unit>>
+        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<Unit>>
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {

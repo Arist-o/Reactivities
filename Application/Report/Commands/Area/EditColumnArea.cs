@@ -1,12 +1,12 @@
 ﻿using Application.Core;
 using AutoMapper;
 using MediatR;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Application.Report.DTOs.Area;
+using Application.Interfaces;
 
 namespace Application.Report.Commands.Area
 {
@@ -17,7 +17,7 @@ namespace Application.Report.Commands.Area
             public required AreaEditColumnDto AreaEditColumnDto { get; set; }
         }
 
-        public class Handler(AppDbContext context) : IRequestHandler<Command, Result<Unit>>
+        public class Handler(IAppDbContext context) : IRequestHandler<Command, Result<Unit>>
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {

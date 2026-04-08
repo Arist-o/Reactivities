@@ -1,6 +1,6 @@
-﻿using MediatR;
+﻿using Application.Interfaces;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,9 +10,9 @@ namespace Application.Core
     public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
-        private readonly AppDbContext _context;
+        private readonly IAppDbContext _context;
 
-        public TransactionBehavior(AppDbContext context) => _context = context;
+        public TransactionBehavior(IAppDbContext context) => _context = context;
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
@@ -21,20 +21,21 @@ namespace Application.Core
                 return await next();
             }
 
-            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            var executionStrategy = _context.CreateExecutionStrategy();
 
             return await executionStrategy.ExecuteAsync(async () =>
             {
-                await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+                await _context.BeginTransactionAsync(cancellationToken);
+
                 try
                 {
-                    var response = await next(); 
-                    await transaction.CommitAsync(cancellationToken);
+                    var response = await next();
+                    await _context.CommitTransactionAsync(cancellationToken);
                     return response;
                 }
                 catch (Exception)
                 {
-                    await transaction.RollbackAsync(cancellationToken);
+                    await _context.RollbackTransactionAsync(cancellationToken);
                     throw;
                 }
             });

@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -13,7 +13,7 @@ namespace Infrastructure.Security
     public class IsHostRequirement : IAuthorizationRequirement
     {
     }
-    public class IsHostRequirementHandler(AppDbContext dbcontext, IHttpContextAccessor httpContextAccessor) 
+    public class IsHostRequirementHandler(IAppDbContext dbcontext, IHttpContextAccessor httpContextAccessor) 
         : AuthorizationHandler<IsHostRequirement>
     {
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, IsHostRequirement requirement)

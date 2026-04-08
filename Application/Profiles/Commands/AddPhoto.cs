@@ -3,7 +3,7 @@ using Application.Interfaces;
 using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Persistence;
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +17,7 @@ namespace Application.Profiles.Commands
             public required IFormFile File { get; set; }
         }
 
-        public class Handler(IUserAccessor userAccessor, AppDbContext context,
+        public class Handler(IUserAccessor userAccessor, IAppDbContext context,
             IPhotoService photoService) : IRequestHandler<Command, Result<Photo>>
         {
             public async Task<Result<Photo>> Handle(Command request, CancellationToken cancellationToken)

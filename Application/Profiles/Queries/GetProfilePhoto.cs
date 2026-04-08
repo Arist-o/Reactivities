@@ -1,12 +1,12 @@
 ﻿using Application.Core;
 using Domain;
 using MediatR;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Application.Interfaces;
 
 namespace Application.Profiles.Queries
 {
@@ -16,7 +16,7 @@ namespace Application.Profiles.Queries
         {
             public required string UserId { get; set; }
         }
-        public class Handler(AppDbContext context) : IRequestHandler<Query, Result<List<Photo>>>
+        public class Handler(IAppDbContext context) : IRequestHandler<Query, Result<List<Photo>>>
         {
             public async Task<Result<List<Photo>>> Handle(Query request, CancellationToken cancellationToken)
             {

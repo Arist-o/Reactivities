@@ -6,7 +6,6 @@ using AutoMapper.QueryableExtensions;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq.Dynamic.Core;
@@ -20,7 +19,7 @@ namespace Application.Activities.Queries
         {
             public required ReadActivityDto ReadActivityDto { get; set; }
         }
-        public class Handler(AppDbContext context, IMapper mapper, IUserAccessor userAccessor)
+        public class Handler(IAppDbContext context, IMapper mapper, IUserAccessor userAccessor)
           : IRequestHandler<Command, Result<Core.PagedResult<ActivityDto>>>
         {                   
             public async Task<Result<Core.PagedResult<ActivityDto>>> Handle(Command request, CancellationToken cancellationToken)

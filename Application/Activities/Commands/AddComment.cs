@@ -4,7 +4,6 @@ using Application.Interfaces;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Domain;
 using System;
 using System.Collections.Generic;
@@ -23,7 +22,7 @@ namespace Application.Activities.Commands
 
         }
 
-        public class Handler(AppDbContext context,IMapper mapper,IUserAccessor userAccessor) 
+        public class Handler(IAppDbContext context,IMapper mapper,IUserAccessor userAccessor) 
             : IRequestHandler<Command, Result<CommentDto>>
         { 
             public async Task<Result<CommentDto>> Handle(Command request, CancellationToken cancellationToken)

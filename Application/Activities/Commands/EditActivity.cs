@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Persistence;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,6 +6,7 @@ using Domain;
 using AutoMapper;
 using Application.Core;
 using Application.Activities.DTOs;
+using Application.Interfaces;
 
 namespace Application.Activities.Commands
 {
@@ -17,7 +17,7 @@ namespace Application.Activities.Commands
             public required EditActivityDto ActivityDto { get; set; }
         }
 
-        public class Handler(AppDbContext context, IMapper mapper) : IRequestHandler<Command,Result<Unit>>
+        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command,Result<Unit>>
         {
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
