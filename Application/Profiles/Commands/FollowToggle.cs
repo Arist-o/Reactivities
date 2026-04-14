@@ -23,7 +23,6 @@ namespace Application.Profiles.Commands
 
                 if (target == null) return Result<Unit>.Failure("Target user not found", 400);
 
-                // ДОДАНО: Заборона підписуватись на самого себе
                 if (observer.Id == target.Id)
                     return Result<Unit>.Failure("You cannot follow yourself", 400);
 

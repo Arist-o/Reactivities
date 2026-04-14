@@ -9,27 +9,19 @@ namespace Application.Interfaces
 {
     public interface IAppDbContext
     {
-        DbSet<Activity> Activities { get; }
+        DbSet<Activity> Activities { get; set; }
+        DbSet<ActivityAttendee> ActivityAttendees { get; set; }
+         DbSet<Photo> Photos { get; set; }
+        DbSet<Comment> Comments { get; set; }
+         DbSet<UserFollowing> UserFollowings { get; set; }
+        DbSet<Area> Areas { get; set; }
+        DbSet<City> Cities { get; set; }
+        DbSet<Street> Streets { get; set; }
+        DbSet<WareHouse> WareHouses { get; set; }
+        DbSet<Domain.Report> Reports { get; set; }
+        DbSet<Domain.User> Users { get; }
 
-        DbSet<ActivityAttendee> ActivityAttendees { get; }
-
-        DbSet<Photo> Photos { get; }
-
-        DbSet<Comment> Comments { get;  }
-
-        DbSet<UserFollowing> UserFollowings { get; }
-
-        DbSet<Area> Areas { get; }
-
-        DbSet<City> Cities { get;}
-
-        DbSet<Street> Streets { get; }
-
-        DbSet<WareHouse> WareHouses { get; }
-        DbSet<User> Users { get; }
-
-        DbSet<Domain.Report> Reports { get; }
-
+        Task BulkCreateAreasWithCentersAsync(List<Domain.Area> areas, List<Domain.City> cities, CancellationToken ct);
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 
         Task BeginTransactionAsync(CancellationToken ct);

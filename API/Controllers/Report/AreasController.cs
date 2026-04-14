@@ -41,5 +41,11 @@ namespace API.Controllers.Report
         {
             return HandleResult(await Mediator.Send(command));
         }
+
+        [HttpPost("bulk")]
+        public async Task<ActionResult> CreateAreasBulk([FromBody] CreateAreasBulk.Command command)
+        {
+            return HandleResult(await Mediator.Send(command));
+        }
     }
 }
