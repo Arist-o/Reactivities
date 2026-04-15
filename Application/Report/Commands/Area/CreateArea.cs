@@ -2,6 +2,7 @@
 using Application.Interfaces;
 using Application.Report.DTOs.Area;
 using AutoMapper;
+using FluentValidation;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,19 +12,30 @@ namespace Application.Report.Commands.Area
 {
     public class CreateArea
     {
-        public class Command : IRequest<Result<Guid>>
+        public class Command : IRequest<Result<AreaResponseDto>>
         {
             public required AreaCreateDto AreaCreateDto { get; set; }
         }
-        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<Guid>>
+        public class Validator : AbstractValidator<Command>
         {
-            public async Task<Result<Guid>> Handle(Command request, CancellationToken cancellationToken)
+            public Validator(IAppDbContext context)
             {
+                RuleFor(x => x.AreaCreateDto.AreaCenterId)
+                    .MustHaveValidCity(context);
+
+                RuleFor(x => x.AreaCreateDto.Description)
+                    .NotEmpty().WithMessage("Description is required");
+            }
+        }
+        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<AreaResponseDto>>
+        {
+            public async Task<Result<AreaResponseDto>> Handle(Command request, CancellationToken cancellationToken)
+            { 
                 var area = mapper.Map<Domain.Area>(request.AreaCreateDto);
                 context.Areas.Add(area);
                 var result = await context.SaveChangesAsync(cancellationToken) > 0;
-                if (!result) return Result<Guid>.Failure("Failed to create area", 500);
-                return Result<Guid>.Success(area.Id);
+                if (!result) return Result<AreaResponseDto>.Failure("Failed to create area", 500);
+                return Result<AreaResponseDto>.Success(mapper.Map<AreaResponseDto>(area));
             }
         }
     }

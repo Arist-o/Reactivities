@@ -6,8 +6,8 @@ namespace Application.Report.DTOs.City
 {
     public class CityEditColumnDto
     {
-        public Guid Id { get; set; }
+        public required Guid Id { get; set; }
 
-        public Guid AreaId { get; set; }
+        public required Guid AreaId { get; set; }
     }
 }

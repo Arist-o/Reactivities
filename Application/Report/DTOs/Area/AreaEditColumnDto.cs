@@ -6,7 +6,7 @@ namespace Application.Report.DTOs.Area
 {
     public class AreaEditColumnDto
     {
-        public Guid Id { get; set; }
-        public Guid AreaCenterId { get; set; }
+        public required Guid Id { get; set; }
+        public required Guid AreaCenterId { get; set; }
     }
 }

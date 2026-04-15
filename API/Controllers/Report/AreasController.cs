@@ -13,20 +13,20 @@ namespace API.Controllers.Report
         }
 
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreateArea([FromBody] AreaCreateDto areaCreateDto)
+        public async Task<ActionResult<AreaResponseDto>> CreateArea([FromBody] AreaCreateDto areaCreateDto)
         {
             return HandleResult(await Mediator.Send(new CreateArea.Command { AreaCreateDto = areaCreateDto }));
         }
 
         [HttpPut("{Id}")]
-        public async Task<ActionResult> EditArea(Guid Id, [FromBody] AreaEditDto areaEditDto)
+        public async Task<ActionResult<AreaResponseDto>> EditArea(Guid Id, [FromBody] AreaEditDto areaEditDto)
         {
             areaEditDto.Id = Id;
             return HandleResult(await Mediator.Send(new EditArea.Command { AreaEditDto = areaEditDto }));
         }
 
         [HttpPatch("{Id}/set-center")]
-        public async Task<ActionResult> EditColumnArea(Guid Id, [FromBody] Guid areaCenterId)
+        public async Task<ActionResult<AreaResponseDto>> EditColumnArea(Guid Id, [FromBody] Guid areaCenterId)
         {
             return HandleResult(await Mediator.Send(new EditColumnArea.Command { AreaEditColumnDto = new AreaEditColumnDto { Id = Id, AreaCenterId = areaCenterId } }));
         }

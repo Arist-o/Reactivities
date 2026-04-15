@@ -10,6 +10,6 @@ namespace Application.Report.DTOs.Area
 
         public required string Description { get; set; }
 
-        public Guid? AreaCenteId { get; set; } 
+        public required Guid AreaCenteId { get; set; } 
     }
 }

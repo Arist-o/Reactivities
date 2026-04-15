@@ -7,7 +7,7 @@ namespace Application.Report.DTOs.City
 {
     public class CitySimpleDto
     {
-        public Guid Id { get; set; }    
+        public required Guid Id { get; set; }    
 
         public required string Description { get; set; }   
 

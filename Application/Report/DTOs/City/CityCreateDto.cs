@@ -8,6 +8,8 @@ namespace Application.Report.DTOs.City
     {
         public required string Description { get; set; }
 
-        public Guid? AreaId { get; set; }
+        public required Guid AreaId { get; set; }
     }
+
+
 }
