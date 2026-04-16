@@ -2,32 +2,46 @@
 using Application.Interfaces;
 using Application.Report.DTOs.WareHouse;
 using AutoMapper;
+using FluentValidation;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Application.Report.Commands.WareHouse
 {
     public class CreateWareHouse
     {
-        public class Command : IRequest<Result<Guid>>
+        public class Command : IRequest<Result<WareHouseResponseDto>>
         {
             public required WareHouseCreateDto wareHouseCreateDto { get; set; }
         }
-        public class Handler(IAppDbContext context,IMapper mapper) : IRequestHandler<Command, Result<Guid>>
+
+        public class Validator : AbstractValidator<Command>
         {
-            public async Task<Result<Guid>> Handle(Command request, CancellationToken cancellationToken)
+            public Validator(IAppDbContext context)
+            {
+                RuleFor(x => x.wareHouseCreateDto).NotNull().WithMessage("Empty Data");
+
+                When(x => x.wareHouseCreateDto != null, () =>
+                {
+                    RuleFor(x => x.wareHouseCreateDto.CityId).MustHaveValidCity(context);
+                    RuleFor(x => x.wareHouseCreateDto.description).NotEmpty().WithMessage("Description is required");
+                });
+            }
+        }
+
+        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<WareHouseResponseDto>>
+        {
+            public async Task<Result<WareHouseResponseDto>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var wareHouse = mapper.Map<Domain.WareHouse>(request.wareHouseCreateDto);
 
                 context.WareHouses.Add(wareHouse);
+                var result = await context.SaveChangesAsync(cancellationToken) > 0;
 
-                var result = await context.SaveChangesAsync(cancellationToken) > 0; 
+                if (!result) return Result<WareHouseResponseDto>.Failure("Failed to create warehouse", 500);
 
-                if(!result) return Result<Guid>.Failure("Failed to create ware house", 400);
-
-                return Result<Guid>.Success(wareHouse.Id);
+                return Result<WareHouseResponseDto>.Success(mapper.Map<WareHouseResponseDto>(wareHouse));
             }
         }
     }

@@ -1,38 +1,47 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using Application.Report.DTOs.WareHouse;
 using AutoMapper;
+using FluentValidation;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Application.Interfaces;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Application.Report.Commands.WareHouse
 {
     public class EditWareHouse
     {
-        public class Command : IRequest<Result<Unit>>
+        public class Command : IRequest<Result<WareHouseResponseDto>>
         {
             public required WareHouseEditDto WareHouseEditDto { get; set; }
         }
-        public class Handler(IAppDbContext context,IMapper mapper) : IRequestHandler<Command, Result<Unit>>
+
+        public class Validator : AbstractValidator<Command>
         {
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            public Validator(IAppDbContext context)
             {
-                var wareHouse = context.WareHouses.FindAsync([request.WareHouseEditDto.Id], cancellationToken).Result;
+                RuleFor(x => x.WareHouseEditDto).NotNull().WithMessage("Empty Data");
 
-                if (wareHouse == null) return Result<Unit>.Failure("WareHouse not found", 404);
+                When(x => x.WareHouseEditDto != null, () =>
+                {
+                    RuleFor(x => x.WareHouseEditDto.Id).MustHaveValidWareHouse(context);
+                    RuleFor(x => x.WareHouseEditDto.CityId).MustHaveValidCity(context);
+                    RuleFor(x => x.WareHouseEditDto.description).NotEmpty().WithMessage("Description is required");
+                });
+            }
+        }
 
-                var cityExists = await context.Cities.AnyAsync(a => a.Id == request.WareHouseEditDto.CityId, cancellationToken);
-                if (!cityExists) return Result<Unit>.Failure("City not found", 404);
+        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<WareHouseResponseDto>>
+        {
+            public async Task<Result<WareHouseResponseDto>> Handle(Command request, CancellationToken cancellationToken)
+            {
+                var wareHouse = await context.WareHouses.FindAsync([request.WareHouseEditDto.Id], cancellationToken);
 
                 mapper.Map(request.WareHouseEditDto, wareHouse);
 
-                var result = await context.SaveChangesAsync(cancellationToken) > 0; 
+                await context.SaveChangesAsync(cancellationToken);
 
-                if(!result) return Result<Unit>.Failure("Failed to update WareHouse", 400);
-
-                return Result<Unit>.Success(Unit.Value);
+                return Result<WareHouseResponseDto>.Success(mapper.Map<WareHouseResponseDto>(wareHouse));
             }
         }
     }

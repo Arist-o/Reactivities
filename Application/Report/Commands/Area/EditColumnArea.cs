@@ -1,44 +1,56 @@
 ﻿using Application.Core;
-using AutoMapper;
-using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Application.Report.DTOs.Area;
 using Application.Interfaces;
+using Application.Report.DTOs.Area;
+using AutoMapper;
+using FluentValidation;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Application.Report.Commands.Area
 {
     public class EditColumnArea
     {
-        public class Command : IRequest<Result<Unit>>
+        public class Command : IRequest<Result<AreaResponseDto>>
         {
             public required AreaEditColumnDto AreaEditColumnDto { get; set; }
         }
 
-        public class Handler(IAppDbContext context) : IRequestHandler<Command, Result<Unit>>
+        public class Validator : AbstractValidator<Command>
         {
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            public Validator(IAppDbContext context)
+            {
+                RuleFor(x => x.AreaEditColumnDto)
+                    .NotNull()
+                    .WithMessage("Empty Data");
+
+                When(x => x.AreaEditColumnDto != null, () =>
+                {
+                    RuleFor(x => x.AreaEditColumnDto.Id)
+                        .MustAsync(async (id, ct) => await context.Areas.AnyAsync(a => a.Id == id, ct))
+                        .WithMessage("Area not found");
+
+                    RuleFor(x => x.AreaEditColumnDto.AreaCenterId)
+                        .MustAsync(async (cityId, ct) => await context.Cities.AnyAsync(c => c.Id == cityId, ct))
+                        .WithMessage("City not found");
+                });
+            }
+        }
+
+        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<AreaResponseDto>>
+        {
+            public async Task<Result<AreaResponseDto>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var area = await context.Areas.FindAsync([request.AreaEditColumnDto.Id], cancellationToken);
 
-                if (area == null) return Result<Unit>.Failure("Area not found", 404);
+                area!.AreaCenterId = request.AreaEditColumnDto.AreaCenterId;
 
-                var cityExists = await context.Cities.AnyAsync(c => c.Id == request.AreaEditColumnDto.AreaCenterId, cancellationToken);
-                if (!cityExists) return Result<Unit>.Failure("City not found", 404);
+                var result = await context.SaveChangesAsync(cancellationToken) > 0;
 
-                area.AreaCenterId = request.AreaEditColumnDto.AreaCenterId;
+                if (!result) return Result<AreaResponseDto>.Failure("Failed to update area column", 500);
 
-                try
-                {
-                    await context.SaveChangesAsync(cancellationToken);
-                    return Result<Unit>.Success(Unit.Value);
-                }
-                catch (Exception ex)
-                {
-                    return Result<Unit>.Failure("Database error: " + ex.Message, 400);
-                }
+                return Result<AreaResponseDto>.Success(mapper.Map<AreaResponseDto>(area));
             }
         }
     }

@@ -11,6 +11,6 @@ namespace Application.Report.DTOs.WareHouse
 
         public required int number { get; set; }
 
-        public Guid? CityId { get; set; }
+        public required Guid CityId { get; set; }
     }
 }

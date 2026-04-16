@@ -19,10 +19,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers(opt => { 
-    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();   
+builder.Services.AddControllers(opt =>
+{
+    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     opt.Filters.Add(new AuthorizeFilter(policy));
+}).ConfigureApiBehaviorOptions(options => {
+    options.SuppressModelStateInvalidFilter = true;
 });
+
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {

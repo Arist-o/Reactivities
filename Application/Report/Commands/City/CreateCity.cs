@@ -18,13 +18,22 @@ namespace Application.Report.Commands.City
         }
         public class Validator : AbstractValidator<Command>
         {
+
             public Validator(IAppDbContext context)
             {
-                RuleFor(x => x.CityCreateDto.AreaId)
-                    .MustHaveValidArea(context);
+                RuleFor(x => x.CityCreateDto)
+                    .NotNull()
+                    .WithMessage("Empty Data");
 
-                RuleFor(x => x.CityCreateDto.Description)
-                    .NotEmpty().WithMessage("Description is required");
+                When(x => x.CityCreateDto != null, () =>
+                {
+                    RuleFor(x => x.CityCreateDto.AreaId)
+                        .NotEmpty().WithMessage("AreaId is required")
+                        .MustHaveValidArea(context);
+
+                    RuleFor(x => x.CityCreateDto.Description)
+                        .NotEmpty().WithMessage("Description is required");
+                });
             }
         }
 

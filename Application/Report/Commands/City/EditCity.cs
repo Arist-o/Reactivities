@@ -2,30 +2,58 @@
 using Application.Interfaces;
 using Application.Report.DTOs.City;
 using AutoMapper;
+using FluentValidation;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.EntityFrameworkCore;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Application.Report.Commands.City
 {
     public class EditCity
     {
-        public class Command : IRequest<Result<Unit>>
+        public class Command : IRequest<Result<CityResponseDto>>
         {
             public required CityEditDto CityEditDto { get; set; }
-        }   
-        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<Unit>>
+        }
+
+        public class Validator : AbstractValidator<Command>
         {
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            public Validator(IAppDbContext context)
+            {
+                RuleFor(x => x.CityEditDto)
+                 .NotNull()
+                 .WithMessage("Empty Data");
+
+                When(x => x.CityEditDto != null, () =>
+                {
+                    RuleFor(x => x.CityEditDto.Id)
+                        .MustAsync(async (id, ct) => await context.Cities.AnyAsync(c => c.Id == id, ct))
+                        .WithMessage("City not found");
+
+                    RuleFor(x => x.CityEditDto.Description)
+                        .NotEmpty().WithMessage("Description is required");
+
+                    RuleFor(x => x.CityEditDto.AreaId)
+                        .MustAsync(async (areaId, ct) => await context.Areas.AnyAsync(a => a.Id == areaId, ct))
+                        .WithMessage("Area not found");
+                });
+            }
+        }
+
+        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<CityResponseDto>>
+        {
+            public async Task<Result<CityResponseDto>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var city = await context.Cities.FindAsync([request.CityEditDto.Id], cancellationToken);
-                if (city == null) return Result<Unit>.Failure("City not found", 404);
+
                 mapper.Map(request.CityEditDto, city);
-                var result = await context.SaveChangesAsync(cancellationToken) > 0;
-                if (!result) return Result<Unit>.Failure("Failed to update city", 400);
-                return Result<Unit>.Success(Unit.Value);
+
+                await context.SaveChangesAsync(cancellationToken);
+
+
+                return Result<CityResponseDto>.Success(mapper.Map<CityResponseDto>(city));
             }
-        }   
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace Application.Report.DTOs.Street
 
         public required string description { get; set; }
 
-        public string? street_type { get; set; }
+        public string? streets_type { get; set; }
 
         public required Guid CityId { get; set; }
     }

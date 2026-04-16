@@ -1,74 +1,55 @@
 ﻿using Application.Core;
 using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace API.Middleware
 {
     public class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger, IHostEnvironment env) : IMiddleware
     {
-        public async Task InvokeAsync(HttpContext context,RequestDelegate next)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             try
             {
                 await next(context);
             }
-            catch (ValidationException ex) {
+            catch (ValidationException ex)
+            {
                 await HandleValidationException(context, ex);
             }
             catch (Exception ex)
             {
-               await HandleException(context, ex);
+                await HandleGenericException(context, ex, logger, env);
             }
-        }
-
-        private async Task HandleException(HttpContext context, Exception ex)
-        {
-            logger.LogError(ex, ex.Message);
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
-            var response = env.IsDevelopment()
-                ? new AppException(context.Response.StatusCode,ex.Message, ex.StackTrace)
-                : new AppException(context.Response.StatusCode, ex.Message,null);
-
-            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
-            var json = JsonSerializer.Serialize(response, options);
-
-            await context.Response.WriteAsync(json);
         }
 
         private static async Task HandleValidationException(HttpContext context, ValidationException ex)
         {
-            var validationErrors = new Dictionary<string, string[]>();
-
-            if (ex.Errors is not null) 
-            {
-                foreach (var error in ex.Errors) 
-                {
-                    if (validationErrors.TryGetValue(error.PropertyName, out var existingErrors))
-                    {
-                        validationErrors[error.PropertyName] = [.. existingErrors, error.ErrorMessage];
-                    }
-                    else 
-                    {
-                        validationErrors[error.PropertyName] = [error.ErrorMessage];
-                    }
-                }
-            }
-
+            context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
-            var validationProblemDetails = new ValidationProblemDetails(validationErrors)
-            { 
-                Status = StatusCodes.Status400BadRequest,
-                Type = "ValidationFailure",
-                Title = "Validation error",
-                Detail = "One or more validation errors has occured"
-            };
+            var errorMessage = string.Join("; ", ex.Errors.Select(e => e.ErrorMessage));
 
-            await context.Response.WriteAsJsonAsync(validationProblemDetails);
+            var result = Result<object>.Failure(errorMessage, StatusCodes.Status400BadRequest);
+
+            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(result, options));
+        }
+
+        private static async Task HandleGenericException(HttpContext context, Exception ex, ILogger logger, IHostEnvironment env)
+        {
+            logger.LogError(ex, "An unhandled exception occurred: {Message}", ex.Message);
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+            var message = env.IsDevelopment()
+                ? $"{ex.Message} | StackTrace: {ex.StackTrace}"
+                : "Internal Server Error";
+
+            var result = Result<object>.Failure(message, StatusCodes.Status500InternalServerError);
+
+            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(result, options));
         }
     }
 }

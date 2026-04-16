@@ -20,11 +20,19 @@ namespace Application.Report.Commands.Area
         {
             public Validator(IAppDbContext context)
             {
-                RuleFor(x => x.AreaCreateDto.AreaCenterId)
-                    .MustHaveValidCity(context);
+                RuleFor(x => x.AreaCreateDto)
+                 .NotNull()
+                 .WithMessage("Empty Data");
 
-                RuleFor(x => x.AreaCreateDto.Description)
-                    .NotEmpty().WithMessage("Description is required");
+                When(x => x.AreaCreateDto != null, () =>
+                {
+
+
+                    RuleFor(x => x.AreaCreateDto.Description)
+                        .NotEmpty().WithMessage("Description is required");
+                });
+
+
             }
         }
         public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<AreaResponseDto>>

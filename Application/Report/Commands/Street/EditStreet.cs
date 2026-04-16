@@ -2,35 +2,46 @@
 using Application.Interfaces;
 using Application.Report.DTOs.Street;
 using AutoMapper;
+using FluentValidation;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Application.Report.Commands.Street
 {
     public class EditStreet
     {
-        public class Command : IRequest<Result<Unit>>
+        public class Command : IRequest<Result<StreetResponseDto>>
         {
             public required StreetEditDto StreetEditDto { get; set; }
-        }   
-        public class Handler(IAppDbContext context,IMapper mapper) : IRequestHandler<Command, Result<Unit>>
+        }
+
+        public class Validator : AbstractValidator<Command>
         {
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            public Validator(IAppDbContext context)
             {
-                
-                var street =  context.Streets.FindAsync([request.StreetEditDto.Id], cancellationToken).Result;
-                if(street == null) return Result<Unit>.Failure("Street not found", 404);
+                RuleFor(x => x.StreetEditDto).NotNull().WithMessage("Empty Data");
+
+                When(x => x.StreetEditDto != null, () =>
+                {
+                    RuleFor(x => x.StreetEditDto.Id).MustHaveValidStreet(context);
+                    RuleFor(x => x.StreetEditDto.CityId).MustHaveValidCity(context);
+                    RuleFor(x => x.StreetEditDto.description).NotEmpty().WithMessage("Description is required");
+                });
+            }
+        }
+
+        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<StreetResponseDto>>
+        {
+            public async Task<Result<StreetResponseDto>> Handle(Command request, CancellationToken cancellationToken)
+            {
+                var street = await context.Streets.FindAsync([request.StreetEditDto.Id], cancellationToken);
 
                 mapper.Map(request.StreetEditDto, street);
 
-                var result = await context.SaveChangesAsync(cancellationToken) > 0; 
+                await context.SaveChangesAsync(cancellationToken);
 
-                if(!result) return Result<Unit>.Failure("Failed to update street", 400);
-
-                return Result<Unit>.Success(Unit.Value);
-
+                return Result<StreetResponseDto>.Success(mapper.Map<StreetResponseDto>(street));
             }
         }
     }

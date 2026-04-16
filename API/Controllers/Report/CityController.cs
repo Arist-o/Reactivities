@@ -22,18 +22,18 @@ namespace API.Controllers.Report
         }
 
 
-        [HttpPut("{Id}")]
-        public async Task<ActionResult<CityResponseDto>> EditCity(Guid Id, [FromBody] CityEditDto cityEditDto)
+        [HttpPut]
+        public async Task<ActionResult<CityResponseDto>> EditCity( [FromBody] CityEditDto cityEditDto)
         {
-            cityEditDto.Id = Id;
+
             return HandleResult(await Mediator.Send(new EditCity.Command { CityEditDto = cityEditDto }));
         }
 
 
-        [HttpPatch("{Id}/set-area")]
-        public async Task<ActionResult<CityResponseDto>> EditColumnCity(Guid Id, [FromBody] Guid areaId)
+        [HttpPatch("set-area")]
+        public async Task<ActionResult<CityResponseDto>> EditColumnCity([FromBody] CityEditColumnDto cityEditColumnDto)
         {
-            return HandleResult(await Mediator.Send(new EditColumnCity.Command { CityEditColumnDto = new CityEditColumnDto { Id = Id, AreaId = areaId } }));
+            return HandleResult(await Mediator.Send(new EditColumnCity.Command { CityEditColumnDto = cityEditColumnDto }));
         }
 
         [HttpDelete("{Id}")]

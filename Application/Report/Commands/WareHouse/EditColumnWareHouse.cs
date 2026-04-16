@@ -1,45 +1,48 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using Application.Report.DTOs.WareHouse;
 using AutoMapper;
+using FluentValidation;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Application.Interfaces;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Application.Report.Commands.WareHouse
 {
     public class EditColumnWareHouse
     {
-        public class Command : IRequest<Result<Unit>>
+        public class Command : IRequest<Result<WareHouseResponseDto>>
         {
             public required WareHouseEditColumnDto WareHouseEditColumnDto { get; set; }
         }
-        public class Handler(IAppDbContext context) : IRequestHandler<Command, Result<Unit>>
+
+        public class Validator : AbstractValidator<Command>
         {
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            public Validator(IAppDbContext context)
             {
-                var wareHouse = await context.WareHouses.FindAsync([ request.WareHouseEditColumnDto.Id ], cancellationToken);
+                RuleFor(x => x.WareHouseEditColumnDto).NotNull().WithMessage("Empty Data");
 
-                if(wareHouse == null) return Result<Unit>.Failure("Not found", 404);
-
-                var cityExists = await context.Cities.AnyAsync(a => a.Id == request.WareHouseEditColumnDto.CityId, cancellationToken);
-                if (!cityExists) return Result<Unit>.Failure("City not found", 404);
-
-                wareHouse.CityId = request.WareHouseEditColumnDto.CityId;
-
-
-
-                try
+                When(x => x.WareHouseEditColumnDto != null, () =>
                 {
-                    await context.SaveChangesAsync(cancellationToken);
-                    return Result<Unit>.Success(Unit.Value);
-                }
-                catch (Exception ex)
-                {
-                    return Result<Unit>.Failure("Database error: " + ex.Message, 400);
-                }
+                    RuleFor(x => x.WareHouseEditColumnDto.Id).MustHaveValidWareHouse(context);
+                    RuleFor(x => x.WareHouseEditColumnDto.CityId).MustHaveValidCity(context);
+                });
+            }
+        }
+
+        public class Handler(IAppDbContext context, IMapper mapper) : IRequestHandler<Command, Result<WareHouseResponseDto>>
+        {
+            public async Task<Result<WareHouseResponseDto>> Handle(Command request, CancellationToken cancellationToken)
+            {
+                var wareHouse = await context.WareHouses.FindAsync([request.WareHouseEditColumnDto.Id], cancellationToken);
+
+                wareHouse!.CityId = request.WareHouseEditColumnDto.CityId;
+
+                var result = await context.SaveChangesAsync(cancellationToken) > 0;
+
+                if (!result) return Result<WareHouseResponseDto>.Failure("Failed to update warehouse column", 500);
+
+                return Result<WareHouseResponseDto>.Success(mapper.Map<WareHouseResponseDto>(wareHouse));
             }
         }
     }

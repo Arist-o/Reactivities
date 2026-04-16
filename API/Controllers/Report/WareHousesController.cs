@@ -14,22 +14,21 @@ namespace API.Controllers.Report
         }
 
         [HttpPost]
-        public async Task<ActionResult<Guid>> createWareHouse([FromBody] WareHouseCreateDto wareHouseCreateDto)
+        public async Task<ActionResult<WareHouseResponseDto>> createWareHouse([FromBody] WareHouseCreateDto wareHouseCreateDto)
         {
             return HandleResult(await Mediator.Send(new CreateWareHouse.Command { wareHouseCreateDto = wareHouseCreateDto }));
         }
 
-        [HttpPut("{Id}")]
-        public async Task<ActionResult> EditWareHouse(Guid Id, [FromBody] WareHouseEditDto wareHouseEditDto)
+        [HttpPut]
+        public async Task<ActionResult<WareHouseResponseDto>> EditWareHouse([FromBody] WareHouseEditDto wareHouseEditDto)
         {
-            wareHouseEditDto.Id = Id;
             return HandleResult(await Mediator.Send(new EditWareHouse.Command { WareHouseEditDto = wareHouseEditDto }));
         }
 
-        [HttpPatch("{Id}/set-city")]
-        public async Task<ActionResult> EditColumnWareHouse(Guid Id, [FromBody] Guid cityId)
+        [HttpPatch("set-city")]
+        public async Task<ActionResult<WareHouseResponseDto>> EditColumnWareHouse([FromBody] WareHouseEditColumnDto wareHouseEditColumnDto)
         {
-            return HandleResult(await Mediator.Send(new EditColumnWareHouse.Command { WareHouseEditColumnDto = new WareHouseEditColumnDto { Id = Id, CityId = cityId } }));
+            return HandleResult(await Mediator.Send(new EditColumnWareHouse.Command { WareHouseEditColumnDto = wareHouseEditColumnDto }));
         }
 
         [HttpDelete]

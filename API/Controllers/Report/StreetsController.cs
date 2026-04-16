@@ -12,25 +12,24 @@ namespace API.Controllers.Report
            return HandleResult(await Mediator.Send(new GetStreet.Query()));
         }
         [HttpPost]
-        public async Task<ActionResult<Guid>> CreateStreet([FromBody] StreetCreateDto streetCreateDto)
+        public async Task<ActionResult<StreetResponseDto>> CreateStreet([FromBody] StreetCreateDto streetCreateDto)
         {
             return HandleResult(await Mediator.Send(new CreateStreet.Command { streetCreateDto = streetCreateDto }));
         }
-        [HttpPut("{Id}")]
-        public async Task<ActionResult> EditStreet(Guid Id, [FromBody] StreetEditDto streetEditDto)
+        [HttpPut]
+        public async Task<ActionResult<StreetResponseDto>> EditStreet([FromBody] StreetEditDto streetEditDto)
         {
-            streetEditDto.Id = Id;
             return HandleResult(await Mediator.Send(new EditStreet.Command { StreetEditDto = streetEditDto }));
         }
 
-        [HttpPatch("{Id}/set-city")]
-        public async Task<ActionResult> EditColumnStreet(Guid Id, [FromBody] Guid cityId)
+        [HttpPatch("set-city")]
+        public async Task<ActionResult<StreetResponseDto>> EditColumnStreet([FromBody] StreetEditColumnDto streetEditColumnDto)
         {
-            return HandleResult(await Mediator.Send(new EditColumnStreet.Command { StreetEditColumnDto = new StreetEditColumnDto { Id = Id, CityId = cityId } }));
+            return HandleResult(await Mediator.Send(new EditColumnStreet.Command { StreetEditColumnDto = streetEditColumnDto }));
         }
 
         [HttpDelete]
-        public async Task<ActionResult> DeleteStreet(Guid Id)
+        public async Task<ActionResult<StreetResponseDto>> DeleteStreet(Guid Id)
         {
             return HandleResult(await Mediator.Send(new DeleteStreet.Command { Id = Id }));
         }
