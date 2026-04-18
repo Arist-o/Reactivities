@@ -32,7 +32,8 @@ namespace Application.Tests.Report.Commands.Street
             // --- Arrange ---
             var dto = new StreetCreateDto
             {
-                description = "Центральна вулиця"
+                description = "Центральна вулиця",
+                CityId = Guid.NewGuid()
             };
 
             var command = new CreateStreet.Command { streetCreateDto = dto };

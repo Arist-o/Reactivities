@@ -33,7 +33,8 @@ namespace Application.UnitTests.WareHouse.Commands
             var dto = new WareHouseCreateDto
             {
                 description = "Головний склад",
-                number = 101
+                number = 101,
+                CityId = Guid.NewGuid()
             };
 
             var command = new CreateWareHouse.Command { wareHouseCreateDto = dto };

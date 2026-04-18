@@ -56,7 +56,8 @@ namespace Application.Tests.Integration.Report.Commands
             var dto = new WareHouseCreateDto
             {
                 description = "Головний склад",
-                number = 101
+                number = 101,
+                CityId = city.Id
             };
 
             var command = new CreateWareHouse.Command { wareHouseCreateDto = dto };
@@ -81,7 +82,7 @@ namespace Application.Tests.Integration.Report.Commands
             result.IsSuccess.Should().BeTrue();
 
             // Перевіряємо, чи дійсно запис з'явився у реальній БД
-            var savedWareHouse = await _context.WareHouses.FirstOrDefaultAsync(w => w.Id == result.Value);
+            var savedWareHouse = await _context.WareHouses.FirstOrDefaultAsync(w => w.Id == result.Value.Id);
 
             savedWareHouse.Should().NotBeNull();
             savedWareHouse!.description.Should().Be("Головний склад");
